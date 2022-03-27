@@ -13,8 +13,8 @@ const compressoin = require('compression');
 const morgan = require('morgan');
 require('express-async-errors');
 app.use(compressoin());
-app.use(helmet());
-app.use(cors({methods:'GET,PUT,POST,PATCH',allowedHeaders:'*'}))
+//app.use(helmet());
+app.use(cors())
 
 const port=process.env.PORT || 3000;
 
