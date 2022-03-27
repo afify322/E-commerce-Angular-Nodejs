@@ -14,9 +14,7 @@ const morgan = require('morgan');
 require('express-async-errors');
 app.use(compressoin());
 app.use(helmet());
-app.use(cors({
-    origin: "*"
-}))
+app.use(cors())
 const port=process.env.PORT || 3000;
 
 app.use(express.json());
