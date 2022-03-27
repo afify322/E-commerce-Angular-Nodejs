@@ -2,20 +2,19 @@ const Joi = require('joi');
 const {customeError} = require('../helpers/errorHandeler');
 const productSchema = Joi.object({
 
-    orderItems: Joi.string().required(),
-    description: Joi.string().required(),
-    image: Joi.string(),
-    brand: Joi.string(),
-    price: Joi.number().required(),
-    category: Joi.string(),
-    countInStock: Joi.number(),
-    rating: Joi.number().min(0).max(5).required(),
-    dateCreated: Joi.date(),
-    isFeatured: Joi.bool()
+    orderItems: Joi.any().required(),
+    shippingAddress1: Joi.string().required(),
+    shippingAddress2: Joi.string(),
+    city: Joi.string().required(),
+    zip: Joi.string().required(),
+    country: Joi.string().required(),
+    phone: Joi.string().required(),
+    status: Joi.string(),
+    userId: Joi.string()
 });
 
 
-exports.productValidation =   async function(req, res, next) { 
+exports.orderValidation =   async function(req, res, next) { 
         const {body}=req;
 
         try {
