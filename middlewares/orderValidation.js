@@ -10,7 +10,8 @@ const productSchema = Joi.object({
     country: Joi.string().required(),
     phone: Joi.string().required(),
     status: Joi.string(),
-    userId: Joi.string()
+    userId: Joi.string().required(),
+    totalPrice: Joi.number().required()
 });
 
 
