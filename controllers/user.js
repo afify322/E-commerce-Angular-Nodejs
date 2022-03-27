@@ -14,6 +14,8 @@ exports.logIn = async (req, res, next) => {
   const { body: { email, password } } = req;
 
   let user = await User.findOne({ email: email }).select('password email isAdmin');
+    if(!user)return next(customeError({ status: 400, message: "invalid Email or Password" }));
+
   let isValid=await user.comparePasswords(password);
   if (isValid) {
     let token = await User.createToken(user);
