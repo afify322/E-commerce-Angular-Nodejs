@@ -7,8 +7,8 @@ const productSchema = Joi.object({
     image: Joi.string(),
     brand: Joi.string(),
     price: Joi.number().required(),
-    category: Joi.string(),
-    countInStock: Joi.number(),
+    category: Joi.string().required(),
+    countInStock: Joi.number().required(),
     rating: Joi.number().min(0).max(5).required(),
     dateCreated: Joi.date(),
     isFeatured: Joi.bool()
