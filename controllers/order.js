@@ -4,8 +4,12 @@ const {Product}=require('../models/product');
 
 
 exports.getAllOrders=async (req,res)=>{
-let orders=await Order.find().populate({path:'orderItems',populate:{path:'product',populate:'category'}}).sort({'dateOrdered': -1});
-res.status(200).json({success:true,orders:orders});
+    let {page ,limit} = req.query;
+    const size=await Order.count().exec();
+    const skip = (page || 1 - 1) *(limit || 10);
+    const pages=Math.ceil(+size/+(limit || 10));
+let orders=await Order.find().skip(skip).limit(limit).populate({path:'orderItems',populate:{path:'product',populate:'category'}}).populate('userId').sort({'dateOrdered': -1}).exec();
+res.status(200).json({success:true,orders:orders,pages,size});
 }
 
 
@@ -18,7 +22,7 @@ const {body:{
 
     
 let items=await Promise.all(orderItems.map(async (e)=>{
-    let singleOrderItem= await new OrderItem(e);
+    let singleOrderItem= await new OrderItem({product:e.id,quantity:e.quantity});
     singleOrderItem.save();
     return singleOrderItem._id;
 }))

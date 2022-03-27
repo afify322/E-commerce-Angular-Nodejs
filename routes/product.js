@@ -10,7 +10,6 @@ router.get('/category/:id',Product.findProductByCategory);
 router.post('/', productValidation, Product.addProduct);
 router.patch('/:id', Product.EditProductById);
 router.delete('/:id', Product.deleteProduct);
-
 router.get('/',Product.productSearch);
 
 
