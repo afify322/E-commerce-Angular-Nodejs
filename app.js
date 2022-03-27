@@ -17,7 +17,7 @@ app.use(helmet());
 app.use(cors({
     origin: "*"
 }))
-
+const port=process.env.PORT || 5000;
 
 app.use(express.json());
 app.use('/user', userRoute);
@@ -32,6 +32,6 @@ app.use((req, res) => {
 })
 app.use(morgan('tiny'));
 
-app.listen(3000, () => {
+app.listen(port, () => {
     console.log("server running at 3000");
 })
