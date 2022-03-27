@@ -15,6 +15,10 @@ require('express-async-errors');
 app.use(compressoin());
 //app.use(helmet());
 app.use(cors())
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3389e7d882f2997f5be241b520bd77e61b21c14d
 const port=process.env.PORT || 3000;
 
 app.use(express.json());

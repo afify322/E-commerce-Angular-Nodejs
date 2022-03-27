@@ -14,7 +14,11 @@ exports.logIn = async (req, res, next) => {
   const { body: { email, password } } = req;
 
   let user = await User.findOne({ email: email }).select('password email isAdmin');
+<<<<<<< HEAD
   if(!user)return next(customeError({ status: 400, message: "invalid Email or Password" }));
+=======
+    if(!user)return next(customeError({ status: 400, message: "invalid Email or Password" }));
+>>>>>>> 3389e7d882f2997f5be241b520bd77e61b21c14d
 
   let isValid=await user.comparePasswords(password);
   if (isValid) {
