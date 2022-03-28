@@ -6,6 +6,7 @@ module.exports = {
     addProduct: async (req, res, next) => {
         
 
+        
         const { body: { name, description, image, brand, price, category, countInStock, rating, dateCreated, isFeatured } } = req;
         const _category = await Category.findById(category);
 
@@ -18,11 +19,19 @@ module.exports = {
     },
 
     findAllProduct: async (req, res,next) => {
+
+        const {name,description,brand,priceMax,priceMin,ratingMax,ratingMin}=req.query;
+        
             let {page ,limit} = req.query;
             const size=await Product.count().exec();
             const skip = (page || 1 - 1) *(limit || 10);
             const pages=Math.ceil(+size/+(limit || 10));
-            const products = await Product.find().populate('category').limit(limit).skip(skip).exec();
+
+            const products = await Product.find({name: {$regex: name ?? "", $options: 'i'},
+            description:{$regex: description ?? "",$options:'i'},
+            price:{ $gt: priceMin??0, $lt: priceMax??200 },
+            rating:{ $gt: ratingMin??0, $lt: ratingMax ??6}})
+            .populate('category').limit(limit).skip(skip).exec();
 
             if(size==0)return next(customeError({status:400,message:"Products not found"}))
             return res.status(200).json({ success: true, products,pages,size });
@@ -83,10 +92,4 @@ module.exports = {
 
 
     },
-  productSearch:async(req,res,next)=>{
-    
-        const {name,description}=req.query;
-        const filteredProduct=await Product.find({name: {$regex: name ?? "", $options: 'i'},description:{$regex: description ?? "",$options:'i'}});     
-        res.status(200).send({success:true,filteredProduct});
-  
-}}
+}
