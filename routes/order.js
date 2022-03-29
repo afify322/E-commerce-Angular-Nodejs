@@ -7,9 +7,9 @@ router.get('/',getAllOrders);
 router.post('/',orderValidation, addOrder);
 router.delete('/:id',deleteOrder);
 router.put('/:id',updateOrder);
-router.get('/order/:id',getOrderById);
-router.get('/totalSales/:id',getTotalSales);
+router.get('/:id',getOrderById);
 router.get('/userOrders/:id',userOrders);
+router.get('/totalSales/:id',getTotalSales);
 
 
 module.exports=router
