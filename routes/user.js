@@ -9,7 +9,7 @@ const { parser } = require('../helpers/imageUpload');
 router.get('/', findAll);
 router.post('/', userValidation, addUser);
 router.post('/login', logInValidation, logIn);
-router.delete('/', deleteUser);
+router.delete('/:id', deleteUser);
 router.patch('/', updateUser);
 
 router.patch('/uploadImage/:id', parser, uploadImage);
