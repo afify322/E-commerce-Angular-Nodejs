@@ -29,8 +29,8 @@ module.exports = {
 
             const products = await Product.find({name: {$regex: name ?? "", $options: 'i'},
             description:{$regex: description ?? "",$options:'i'},
-            price:{ $gt: priceMin??0, $lt: priceMax??200 },
-            rating:{ $gt: ratingMin??0, $lt: ratingMax ??6}})
+            price:{ $gte: priceMin??0, $lte: priceMax??200 },
+            rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}})
             .populate('category').limit(limit).skip(skip).exec();
 
             if(size==0)return next(customeError({status:400,message:"Products not found"}))
@@ -38,7 +38,7 @@ module.exports = {
      
     },
 
-    findProductById: async (req, res) => {
+    findProductById: async (req, res,next) => {
         const { id } = req.params;
         const product = await Product.findById(id);
         if (!product) {
@@ -47,28 +47,28 @@ module.exports = {
         res.status(200).json({ success: true, product });
     },
 
-    findProductByCategory: async (req, res) => {
+    findProductByCategory: async (req, res,next) => {
         const { id } = req.params;
-        let {page,size} = req.query;
-        if(!page){
-            page = 1;
-        }
-        if(!size){
-            size = 9;
-        }
-        const limit = parseInt(size);
-        const skip = (page - 1) *size;
+        let {page ,limit} = req.query;
+        const {name,description,brand,priceMax,priceMin,ratingMax,ratingMin}=req.query;
+
+        const size=await Product.count().exec();
+        const skip = (page || 1 - 1) *(limit || 10);
+        const pages=Math.ceil(+size/+(limit || 10));
          const category = await Category.findOne({_id : id});
           if(!category){
           throw customeError({ statusCode: 404, message: "Category Not Found", code: "NOTFOUND-ERROR" });
          }
-        const products = await Product.find({ category: id }).limit(limit).skip(skip);
+        const products = await Product.find({ category: id }).and({name: {$regex: name ?? "", $options: 'i'},
+        description:{$regex: description ?? "",$options:'i'},
+        price:{ $gte: priceMin??0, $lte: priceMax??200 },
+        rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}}).populate('category').limit(limit).skip(skip).exec();
 
         if (!products) {
 
             throw customeError({ statusCode: 404, message: "Products Not Found", code: "NOTFOUND-ERROR" });
         }
-        res.status(200).json({ success: true, products });
+        res.status(200).json({ success: true, products,pages,size });
     },
     EditProductById: async (req, res, next) => {
         const { id } = req.params;
