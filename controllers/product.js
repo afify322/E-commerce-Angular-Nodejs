@@ -23,8 +23,7 @@ module.exports = {
         const {name,description,brand,priceMax,priceMin,ratingMax,ratingMin}=req.query;
         
             let {page ,limit} = req.query;
-            const size=await Product.count().exec();
-            const skip = (page || 1 - 1) *(limit || 10);
+            const skip = ((page || 1) - 1) *(limit || 10);
             const pages=Math.ceil(+size/+(limit || 10));
 
             const products = await Product.find({name: {$regex: name ?? "", $options: 'i'},
@@ -32,6 +31,7 @@ module.exports = {
             price:{ $gte: priceMin??0, $lte: priceMax??200 },
             rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}})
             .populate('category').limit(limit).skip(skip).exec();
+            const size=products.length;
 
             if(size==0)return next(customeError({status:400,message:"Products not found"}))
             return res.status(200).json({ success: true, products,pages,size });
@@ -51,20 +51,19 @@ module.exports = {
         const { id } = req.params;
         let {page ,limit} = req.query;
         const {name,description,brand,priceMax,priceMin,ratingMax,ratingMin}=req.query;
-
-        const size=await Product.find({ category: id }).count().exec();
         limit = limit || 10;
         page = page || 1;
         const skip = (page - 1) *(limit);
-        const pages=Math.ceil(+size/+(limit));
-         const category = await Category.findOne({_id : id});
-          if(!category){
-          throw customeError({ statusCode: 404, message: "Category Not Found", code: "NOTFOUND-ERROR" });
-         }
+        const category = await Category.findOne({_id : id});
+        if(!category){
+            throw customeError({ statusCode: 404, message: "Category Not Found", code: "NOTFOUND-ERROR" });
+        }
         const products = await Product.find({ category: id }).and({name: {$regex: name ?? "", $options: 'i'},
         description:{$regex: description ?? "",$options:'i'},
         price:{ $gte: priceMin??0, $lte: priceMax??20000 },
         rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}}).populate('category').limit(limit).skip(skip).exec();
+        const size=products.length;
+        const pages=Math.ceil(+size/+(limit));
 
         if (!products) {
 
