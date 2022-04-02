@@ -58,13 +58,16 @@ module.exports = {
         if(!category){
             throw customeError({ statusCode: 404, message: "Category Not Found", code: "NOTFOUND-ERROR" });
         }
-        const products = await Product.find({ category: id }).and({name: {$regex: name ?? "", $options: 'i'},
+        const productsPromise =  Product.find({ category: id }).and({name: {$regex: name ?? "", $options: 'i'},
         description:{$regex: description ?? "",$options:'i'},
         price:{ $gte: priceMin??0, $lte: priceMax??20000 },
-        rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}}).populate('category').limit(limit).skip(skip).exec();
-        const size=products.length;
-        const pages=Math.ceil(+size/+(limit));
+        rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}}).populate('category');
+        const sizePromise=productsPromise.clone();
 
+        const products=await productsPromise.limit(limit).skip(skip);
+        const size=await sizePromise.count();
+       
+        const pages=Math.ceil(+size/+(limit));
         if (!products) {
 
             throw customeError({ statusCode: 404, message: "Products Not Found", code: "NOTFOUND-ERROR" });
