@@ -30,7 +30,14 @@ app.use((req, res) => {
     res.status(404).json({ sucess: false, message: "Route not forund !" })
 })
 app.use(morgan('tiny'));
-
+process.on("uncaughtException",(err)=>{
+    console.log(err);
+    process.exit(1);
+})
+process.on("unhandledRejection",(err)=>{
+    console.log(err);
+    process.exit(1);
+})
 app.listen(port, () => {
     console.log("server running at 3000");
 })
