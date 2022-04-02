@@ -72,7 +72,7 @@ const pages=Math.ceil(+size/+(limit || 10));
 
             throw customeError({ statusCode: 404, message: "Products Not Found", code: "NOTFOUND-ERROR" });
         }
-        res.status(200).json({ success: true, products,pages,size });
+        res.status(200).json({ success: true, products,pages,size,page });
     },
     EditProductById: async (req, res, next) => {
         const { id } = req.params;
