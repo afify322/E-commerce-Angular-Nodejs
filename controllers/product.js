@@ -24,7 +24,7 @@ module.exports = {
         
             let {page ,limit} = req.query;
             const skip = ((page || 1) - 1) *(limit || 10);
-            const pages=Math.ceil(+size/+(limit || 10));
+            
 
             const products = await Product.find({name: {$regex: name ?? "", $options: 'i'},
             description:{$regex: description ?? "",$options:'i'},
@@ -32,7 +32,7 @@ module.exports = {
             rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}})
             .populate('category').limit(limit).skip(skip).exec();
             const size=products.length;
-
+const pages=Math.ceil(+size/+(limit || 10));
             if(size==0)return next(customeError({status:400,message:"Products not found"}))
             return res.status(200).json({ success: true, products,pages,size });
      
