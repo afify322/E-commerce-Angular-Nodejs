@@ -22,13 +22,13 @@ const {body:{
 
     
 let items=await Promise.all(orderItems.map(async (e)=>{
-    let singleOrderItem= await new OrderItem({product:e.id,quantity:e.quantity});
+    let singleOrderItem= await new OrderItem({product:e.productId,quantity:e.quantity});
     singleOrderItem.save();
     return singleOrderItem._id;
 }))
 
 let prices= await Promise.all(orderItems.map(async (e)=>{
-    let singlePrice=await Product.findOne({_id:e.id}).select('price').exec();
+    let singlePrice=await Product.findOne({_id:e.productId}).select('price').exec();
     return (singlePrice.price*e.quantity)
    
 }))
