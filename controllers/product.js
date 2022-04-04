@@ -7,11 +7,13 @@ module.exports = {
         
 
         
-        const { body: { name, description, image, brand, price, category, countInStock, rating, dateCreated, isFeatured } } = req;
+        let { body: { name, description, image, brand, price, category, countInStock, rating, dateCreated, isFeatured } } = req;
         const _category = await Category.findById(category);
+        const exist=await Product.find({name:name});
+        if(exist)return res.status(400).json({success:false,message:"Product Name Already exists"})
 
         if(!_category) return res.status(400).send('Invalid Category');
-
+        image=req.file.path
         const product = await new Product({ name, description, image, brand, price, category, countInStock, rating, dateCreated, isFeatured });
          await product.save();
         res.status(200).json({ success: true, product });
@@ -24,7 +26,7 @@ module.exports = {
         
             let {page ,limit} = req.query;
             const skip = ((page || 1) - 1) *(limit || 10);
-            
+            const pages=Math.ceil(+size/+(limit || 10));
 
             const products = await Product.find({name: {$regex: name ?? "", $options: 'i'},
             description:{$regex: description ?? "",$options:'i'},
@@ -32,7 +34,7 @@ module.exports = {
             rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}})
             .populate('category').limit(limit).skip(skip).exec();
             const size=products.length;
-const pages=Math.ceil(+size/+(limit || 10));
+
             if(size==0)return next(customeError({status:400,message:"Products not found"}))
             return res.status(200).json({ success: true, products,pages,size });
      
@@ -72,7 +74,7 @@ const pages=Math.ceil(+size/+(limit || 10));
 
             throw customeError({ statusCode: 404, message: "Products Not Found", code: "NOTFOUND-ERROR" });
         }
-        res.status(200).json({ success: true, products,pages,size,page });
+        res.status(200).json({ success: true, products,pages,size });
     },
     EditProductById: async (req, res, next) => {
         const { id } = req.params;
