@@ -5,7 +5,7 @@ const { Category } = require('../models/category');
 module.exports = {
     addProduct: async (req, res, next) => {
         
-
+        console.log(req.body);
         
         let { body: { name, description, image, brand, price, category, countInStock, rating, dateCreated, isFeatured } } = req;
         const _category = await Category.findById(category);
