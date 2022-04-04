@@ -9,7 +9,7 @@ module.exports = {
         
         let { body: { name, description, image, brand, price, category, countInStock, rating, dateCreated, isFeatured } } = req;
         const _category = await Category.findById(category);
-        const exist=await Product.find({name:name});
+        const exist=await Product.findOne({name:name});
         if(exist)return res.status(400).json({success:false,message:"Product Name Already exists"})
 
         if(!_category) return res.status(400).send('Invalid Category');
