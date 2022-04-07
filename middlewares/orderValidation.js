@@ -11,7 +11,9 @@ const productSchema = Joi.object({
     phone: Joi.string().required(),
     status: Joi.string(),
     userId: Joi.string()
-    
+
+  
+
 });
 
 
