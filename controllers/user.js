@@ -14,11 +14,9 @@ exports.logIn = async (req, res, next) => {
   const { body: { email, password } } = req;
 
   let user = await User.findOne({ email: email }).select('password email isAdmin');
-<<<<<<< HEAD
   if(!user)return next(customeError({ status: 400, message: "invalid Email or Password" }));
-=======
     if(!user)return next(customeError({ status: 400, message: "invalid Email or Password" }));
->>>>>>> 3389e7d882f2997f5be241b520bd77e61b21c14d
+
 
   let isValid=await user.comparePasswords(password);
   if (isValid) {
@@ -40,12 +38,17 @@ exports.uploadImage = async (req, res, next) => {
 
 
 exports.findAll = async (req, res, next) => {
-  let {page ,limit} = req.query;
-            const size=await User.count().exec();
-            const skip = (page || 1 - 1) *(limit || 10);
-            const pages=Math.ceil(+size/+(limit || 10));
+  let {page ,limit,name} = req.query;
+  limit = limit || 10;
+  page = page || 1;
+  const skip = (page - 1) *(limit);
 
-  let users = await User.find().select('-password').populate('favourite').skip(skip).limit(limit).exec();
+  let usersP =  User.find({name: {$regex: name ?? "", $options: 'i'}}).select('-password').populate('favourite');
+  const sizePromise=usersP.clone();
+
+  let users=await usersP.skip(skip).limit(limit).exec();
+  let size = await sizePromise.count();
+  const pages=Math.ceil(+size/+(limit));
   if (users.length == 0) {
     return res.status(404).json({ success: true, message: "Users not found" })
   }
