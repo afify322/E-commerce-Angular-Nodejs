@@ -21,24 +21,27 @@ module.exports = {
 
     findAllProduct: async (req, res,next) => {
 
+     
+        let {page ,limit} = req.query;
         const {name,description,brand,priceMax,priceMin,ratingMax,ratingMin}=req.query;
-        
-            let {page ,limit} = req.query;
-            limit = limit || 10;
+        limit = limit || 10;
         page = page || 1;
         const skip = (page - 1) *(limit);
-
-            const productsPromise = Product.find({name: {$regex: name ?? "", $options: 'i'},
-            description:{$regex: description ?? "",$options:'i'},
-            price:{ $gte: priceMin??0, $lte: priceMax??200 },
-            rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}})
-            .populate('category');
-        
+        const productsPromise =  Product.find({}).and({name: {$regex: name ?? "", $options: 'i'},
+        description:{$regex: description ?? "",$options:'i'},
+        price:{ $gte: priceMin??0, $lte: priceMax??20000 },
+        rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}}).populate('category');
         const sizePromise=productsPromise.clone();
+
         const products=await productsPromise.limit(limit).skip(skip);
         const size=await sizePromise.count();
-            if(size==0)return next(customeError({status:400,message:"Products not found"}))
-            return res.status(200).json({ success: true, products,pages,size });
+       
+        const pages=Math.ceil(+size/+(limit));
+        if (products.length==0) {
+
+            throw customeError({ statusCode: 404, message: "Products Not Found", code: "NOTFOUND-ERROR" });
+        }
+        res.status(200).json({ success: true, products,pages,size });
      
     },
 
