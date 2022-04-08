@@ -28,14 +28,15 @@ module.exports = {
         page = page || 1;
         const skip = (page - 1) *(limit);
 
-            const products = await Product.find({name: {$regex: name ?? "", $options: 'i'},
+            const productsPromise = Product.find({name: {$regex: name ?? "", $options: 'i'},
             description:{$regex: description ?? "",$options:'i'},
             price:{ $gte: priceMin??0, $lte: priceMax??200 },
             rating:{ $gte: ratingMin??0, $lte: ratingMax ??6}})
-            .populate('category').limit(limit).skip(skip).exec();
-
-            const size=products.length;
-        const pages=Math.ceil(+size/+(limit || 10));
+            .populate('category');
+        
+        const sizePromise=productsPromise.clone();
+        const products=await productsPromise.limit(limit).skip(skip);
+        const size=await sizePromise.count();
             if(size==0)return next(customeError({status:400,message:"Products not found"}))
             return res.status(200).json({ success: true, products,pages,size });
      
